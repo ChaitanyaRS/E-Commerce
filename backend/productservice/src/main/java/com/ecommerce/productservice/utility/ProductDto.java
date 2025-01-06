@@ -12,7 +12,7 @@ public class ProductDto {
     private String description;
     private double price;
     private int quantity;
-    private int category;
+    private String category;
     private String imageLink;
     private int ratings;
 }
