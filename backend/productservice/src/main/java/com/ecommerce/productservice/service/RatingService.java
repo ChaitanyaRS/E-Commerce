@@ -5,12 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import com.ecommerce.productservice.entity.Category;
 import com.ecommerce.productservice.entity.Product;
 import com.ecommerce.productservice.entity.Rating;
 import com.ecommerce.productservice.exception.ProductNotFound;
-import com.ecommerce.productservice.repo.CategoryRepo;
 import com.ecommerce.productservice.repo.ProductRepo;
 import com.ecommerce.productservice.repo.RatingRepo;
 
