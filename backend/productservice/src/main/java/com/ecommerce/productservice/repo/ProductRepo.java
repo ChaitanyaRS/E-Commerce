@@ -1,6 +1,7 @@
 package com.ecommerce.productservice.repo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,5 +17,8 @@ public interface ProductRepo extends JpaRepository<Product,Integer> {
 
     @Query(value = "SELECT * FROM products p WHERE p.r_id = :rId", nativeQuery = true)
     List<Product> findByRId(int rId);
+
+    @Query(value = "SELECT * FROM products p WHERE p.pid = :id", nativeQuery = true)
+    Optional<Product> findByPId(int id);
     
 }

@@ -1,5 +1,6 @@
 package com.ecommerce.cartservice.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.ecommerce.cartservice.entity.Cart;
 import com.ecommerce.cartservice.entity.CartItem;
 import com.ecommerce.cartservice.entity.ProductDto;
+import com.ecommerce.cartservice.exceptions.CartNotFound;
+import com.ecommerce.cartservice.exceptions.NoItemFound;
 import com.ecommerce.cartservice.repo.CartItemRepo;
 import com.ecommerce.cartservice.repo.CartRepo;
 
@@ -52,9 +55,41 @@ public class CartService {
     //check if cart has any other product
     //if not then delete the cart as well
 
-    // public ResponseEntity<String> removeFromCart(Prod) {
+    public ResponseEntity<String> removeFromCart(ProductDto dto) {
+        Cart cart = cartRepo.findByUserId(dto.getUserId()).get();
         
-    // }
+        Optional<CartItem> item = cartItemRepo.findBypId(dto.getProdId(), cart.getCartId());
+        if(item.isEmpty())
+            throw new NoItemFound("Item not found in cart !!");
+
+        int indexOfItem = cart.getCartItemsList().indexOf(item.get());
+
+        if(item.get().getQuantity() > 1){
+            item.get().setQuantity(item.get().getQuantity() - 1);
+            cart.getCartItemsList().set(indexOfItem, item.get());
+        }else{
+            log.info("Item "+item.get() + "removed from cart ");
+            cart.getCartItemsList().remove(item.get());
+        }
+
+        if(cart.getCartItemsList().isEmpty()){
+            cartRepo.delete(cart);
+            log.info("Cart deleted for user "+dto.getUserId());
+        }else
+            cartRepo.save(cart);
+
+        return ResponseEntity.ok().body("Removed !!");
+    }
+
+    public ResponseEntity<List<CartItem>> getCartItemsforUser(int userId) {
+        Cart cart = cartRepo.findByUserId(userId).orElseThrow(() -> new CartNotFound("Cart Not found for this user"));
+        if(cart.getCartItemsList().isEmpty())
+            throw new NoItemFound("Cart is Empty !!"); 
+        else{
+            List<CartItem> cartItems = cart.getCartItemsList(); 
+            return ResponseEntity.ok().body(cartItems);
+        }
+    }
 
 
 
