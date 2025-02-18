@@ -2,7 +2,6 @@ package com.ecommerce.productservice.controller;
 
 import java.util.List;
 
-import com.ecommerce.productservice.entity.ProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.productservice.entity.Product;
 import com.ecommerce.productservice.service.ProductService;
+import com.ecommerce.productservice.utility.ProductDto;
 import com.ecommerce.productservice.utility.ProductForm;
 
 @RestController
@@ -40,9 +40,13 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @DeleteMapping("/delete-product")
-    public ResponseEntity<String> deleteProduct(@RequestParam int prodId, @RequestParam int userId) {
-        return productService.removeProdFromInventory(prodId, userId);
+//    @DeleteMapping("/delete-product")
+//    public ResponseEntity<String> deleteProduct(@RequestParam int prodId, @RequestParam int userId) {
+//        return productService.removeProdFromInventory(prodId, userId);
+//    }
+    @GetMapping("/qty-prod/{pId}")
+    public ResponseEntity<Integer> getQuantityOfSpecProd(@PathVariable int pId){
+        return productService.getQtyOfSpecProd(pId);
     }
 
     @GetMapping("/availability/{id}")

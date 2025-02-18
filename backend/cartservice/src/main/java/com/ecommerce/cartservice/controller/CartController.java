@@ -2,19 +2,15 @@ package com.ecommerce.cartservice.controller;
 
 import java.util.List;
 
+import com.ecommerce.cartservice.entity.Cart;
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ecommerce.cartservice.entity.CartItem;
-import com.ecommerce.cartservice.entity.ProductDto;
 import com.ecommerce.cartservice.service.CartService;
+import com.ecommerce.cartservice.utility.ProductDto;
 
 @RestController
 @RequestMapping("/cart")
@@ -33,8 +29,18 @@ public class CartController {
         return cartService.removeFromCart(dto);
     }
 
+    @DeleteMapping("/empty-cart/{userId}")
+    public ResponseEntity<String> emptyCart(@PathVariable("userId") int userId){
+        return cartService.emptyCartForUser(userId);
+    }
+
     @GetMapping("get-cartitems/{userId}")
     public ResponseEntity<List<CartItem>> getItemsInCartOfUser(@PathVariable int userId){
         return cartService.getCartItemsforUser(userId);
+    }
+
+    @GetMapping("get-carts/{prodId}")
+    public ResponseEntity<List<Cart>> updateCartAccToInvntry(@PathVariable("prodId") int prodId){
+        return cartService.updateCartAccToInventory(prodId);
     }
 }

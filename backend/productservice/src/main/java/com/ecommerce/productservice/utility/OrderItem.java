@@ -13,6 +13,6 @@ public class OrderItem {
     private int prodId;
     private int quantity;
     private double totalPrice;
-
+    private int userId;
 
 }

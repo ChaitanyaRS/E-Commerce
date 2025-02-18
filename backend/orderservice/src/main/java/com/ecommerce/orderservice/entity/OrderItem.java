@@ -11,11 +11,13 @@ public class OrderItem {
     private int prodId;
     private int quantity;
     private double totalPrice;
-
-    public OrderItem(int prodId, int quantity, double totalPrice) {
+    private int userId; 
+    
+    public OrderItem(int prodId, int quantity, double totalPrice,int userId) {
         this.prodId = prodId;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
+        this.userId = userId;
     }
 
 }

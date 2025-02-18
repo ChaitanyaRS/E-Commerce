@@ -2,6 +2,7 @@ package com.ecommerce.orderservice.controller;
 
 import java.util.List;
 
+import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,7 @@ public class OrderController {
 
     @PostMapping("/place-order")
     public ResponseEntity<String> placeOrder(@RequestHeader("Idempotency-key") String key, @RequestBody OrderDto dto) {
-        return orderService.addOrder(key, dto);
+        return orderService.placeOrder(key, dto);
     }
 
     @GetMapping("/get-orders/{userId}")
