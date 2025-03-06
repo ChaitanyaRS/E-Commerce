@@ -25,14 +25,22 @@ public class User {
     private String lastName;
     @Column(unique = true, nullable = false)
     private String email;
+    @Column(unique = true, nullable = false)
+    private long phoneNumber;
+    @Column(nullable = false)
+    private String address;
+    @Column( nullable = false)
+    private long pincode;
     @Column(nullable = false)
     private String password;
 
-    public User(String firstName,String lastName, String email, String password) {
+    public User(String firstName, String lastName, String email, long phoneNumber, String address, long pincode, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.pincode = pincode;
         this.password = password;
     }
-
 }

@@ -1,0 +1,16 @@
+.place-order-button{
+    height: fit-content;
+    margin: auto;
+}
+
+.place-order{
+    width: fit-content;
+    display: flex;
+    margin-top: 9px;
+    gap: 5px;
+    background-color: floralwhite;
+    padding: 5px;
+    border-radius: 5px;
+    justify-self: end;
+    align-items: center;
+}

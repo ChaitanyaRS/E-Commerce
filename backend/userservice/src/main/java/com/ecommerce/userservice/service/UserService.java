@@ -1,5 +1,6 @@
 package com.ecommerce.userservice.service;
 
+import com.ecommerce.userservice.entity.User;
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.userservice.dto.LoginForm;
 import com.ecommerce.userservice.dto.RegistrationForm;
-import com.ecommerce.userservice.entity.User;
 import com.ecommerce.userservice.exceptions.EmailAlreadyExists;
 import com.ecommerce.userservice.exceptions.UserNotFound;
 import com.ecommerce.userservice.repo.UserRepo;
@@ -32,7 +32,9 @@ public class UserService {
     public ResponseEntity<String> registerUser(RegistrationForm form){
         User user = userRepo.findByEmail(form.getEmail());
         if (user == null) {
-            userRepo.save(new User(form.getFirstName(),form.getLastName(),form.getEmail(),new BCryptPasswordEncoder(12).encode(form.getPassword())));
+//            String firstName, String lastName, String email, int phoneNumber, String address, int pincode, String password
+              userRepo.save(new User(form.getFirstName(),form.getLastName(),form.getEmail(),form.getPhoneNumber(),form.getAddress(), form.getPincode(), new BCryptPasswordEncoder(12).encode(form.getPassword())));
+//            userRepo.save(new User(form.getFirstName(),form.getLastName(),form.getEmail(),new BCryptPasswordEncoder(12).encode(form.getPassword())));
             return new ResponseEntity<String>("Account Created !!", HttpStatus.OK);
         }else{
             throw new EmailAlreadyExists("Email Already Exists !!");

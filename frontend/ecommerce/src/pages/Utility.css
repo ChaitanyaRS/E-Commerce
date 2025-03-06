@@ -1,0 +1,68 @@
+.form-control{
+    width: 50%;
+    margin: auto;
+    padding: 15px;
+}
+.w-50{
+    width: 50%;
+}
+.w-100{
+    width: 100%;
+}
+.flex{
+    display: flex;
+    /* gap: 10px; */
+}
+.flex-col{
+    display: flex;
+}
+.mt-10{
+    margin-top:10px
+}
+.row{
+    margin-top: 10px;
+}
+.flex-col{
+    flex-direction: column;
+}
+.flex-row{
+    flex-direction: column;
+}
+.wrap{
+    flex-wrap: wrap;
+}
+.m-auto{
+    margin: auto;
+}
+.h3{
+    font-size: xx-large;
+    width: 50%;
+    text-align: center;
+}
+.align-center{
+    align-items: center;
+}
+.m-10{
+    margin: 10px;
+}
+.text-center{
+    text-align: center;
+}
+.mb-10{
+    margin-bottom: 10px;
+}
+.image-fit{
+    object-fit: fill;
+}
+.content-center{
+    align-content: center;
+}
+.xxx-large{
+    font-size: xxx-large;
+}
+.xx-large{
+    font-size: xx-large;
+}
+.x-large{
+    font-size: x-large;
+}
