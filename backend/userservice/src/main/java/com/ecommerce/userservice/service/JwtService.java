@@ -26,27 +26,27 @@ public class JwtService {
     private String secretKey;
 
     public JwtService() {
-        secretKey = generateSecretKey();
+        secretKey = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
     }
 
-    public String generateSecretKey() {
-        try {
-            KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
-            SecretKey secretKey = keyGen.generateKey();
-            System.out.println("Secret Key : " + secretKey.toString());
-            return Base64.getEncoder().encodeToString(secretKey.getEncoded());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error generating secret key", e);
-        }
-    }
+//    public String generateSecretKey() {
+//        try {
+//            KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
+//            SecretKey secretKey = keyGen.generateKey();
+//            System.out.println("Secret Key : " + secretKey.toString());
+//            return Base64.getEncoder().encodeToString(secretKey.getEncoded());
+//        } catch (NoSuchAlgorithmException e) {
+//            throw new RuntimeException("Error generating secret key", e);
+//        }
+//    }
 
-    public String generateToken(String username) {
+    public String generateToken(String email) {
 
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(username)
+                .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(getKey(), SignatureAlgorithm.HS256).compact();
@@ -58,7 +58,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractUserName(String token) {
+    public String extractEmail(String token) {
         // extract the username from jwt token
         return extractClaim(token, Claims::getSubject);
     }
@@ -79,11 +79,11 @@ public class JwtService {
                 .build().parseClaimsJws(token).getBody();
     }
 
-    public boolean validateToken(String token, UserDetails userDetails) {
-            final String userName = extractUserName(token);
-            return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
-       
-    }
+//    public boolean validateToken(String token, UserDetails userDetails) {
+//            final String email = extractEmail(token);
+//            return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
+//
+//    }
 
     private boolean isTokenExpired(String token) {
         System.out.println("Token time :" + extractExpiration(token));

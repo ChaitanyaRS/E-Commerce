@@ -14,12 +14,16 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { deepOrange } from '@mui/material/colors';
+import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 
 // const pages = [{name:'Home',link:'/home'}, {name:'Category',link:}, 'Cart'];
 // const settings = ['Account', 'Orders', 'Logout'];
 const firstLetter = "C"
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const username = !!sessionStorage.getItem("username");
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -37,7 +41,14 @@ const Navbar = () => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+    handleLogout();
   };
+
+  const handleLogout = () => {
+    Cookies.remove("token");
+    sessionStorage.removeItem("username");
+    navigate("/login");
+  }
 
   return (
     <AppBar position="static">
@@ -174,9 +185,10 @@ const Navbar = () => {
                 <MenuItem key='orders' component='a' href='/orders' onClick={handleCloseUserMenu}>
                   <Typography sx={{ textAlign: 'center' }}>Orders</Typography>
                 </MenuItem>
+                {username &&
                 <MenuItem key='logout' onClick={handleCloseUserMenu}>
                   <Typography sx={{ textAlign: 'center' }}>Logout</Typography>
-                </MenuItem>
+                </MenuItem>}
             </Menu>
           </Box>
         </Toolbar>

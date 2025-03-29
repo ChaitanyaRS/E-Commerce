@@ -24,8 +24,8 @@ public class SecurityConfig {
     @Autowired
     private MyUserDetailsService myUserDetailsService;
 
-    @Autowired
-    private JwtFilter jwtFilter;
+//    @Autowired
+//    private JwtFilter jwtFilter;
 
     @Bean
     public AuthenticationProvider authProvider() {
@@ -35,13 +35,20 @@ public class SecurityConfig {
         return provider;
     }
 
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        return http.cors(Customizer.withDefaults()).csrf(customize -> customize.disable())
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .build();
+//    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.cors(Customizer.withDefaults()).csrf(customize -> customize.disable())
-                .authorizeHttpRequests(request -> request.requestMatchers("/user/register", "/user/login","/user/delete-user").permitAll()
+                .authorizeHttpRequests(request -> request.requestMatchers("/user/register", "/user/login").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
+                .build();
     }
 
     @Bean

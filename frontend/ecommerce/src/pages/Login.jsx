@@ -1,11 +1,41 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm, Controller } from "react-hook-form"
 import { Box, Button, Link, TextField } from "@mui/material"
+import { loginApi } from '../api/userApi'
 import './Utility.css'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
     const { control, handleSubmit, formState: { errors } } = useForm()
-    const loginUser = (data) => console.log(data)
+    // const loginUser = (data) => console.log(data)
+    const [errorMsg, setErrorMsg] = useState("");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const loginUser = async (data) => {
+        console.log(data);
+
+        const { email, password } = data;
+
+        const formData = { email, password };
+        // const { status, message } = await dispatch(loginApi(formData));
+        const responseData = await dispatch(loginApi(formData));
+        const{status, username} = responseData.payload;
+        console.log("status: ",status);
+        console.log("username: ",username);
+
+        if (status == 200) {
+            setErrorMsg("");
+            navigate('/');
+            sessionStorage.setItem("username",username)
+        } else {
+            console.log(username);
+
+            setErrorMsg(username);
+        }
+
+    }
 
     return (
         // <>
@@ -13,7 +43,7 @@ const Login = () => {
             <center className='mt-10'><h2>Login</h2></center>
             <Box className="form-control">
                 <form onSubmit={handleSubmit(loginUser)}>
-                    <div className="flex flex-col"  style={{gap:'10px'}}>
+                    <div className="flex flex-col" style={{ gap: '10px' }}>
                         <Controller
                             name='email'
                             control={control}
@@ -50,7 +80,9 @@ const Login = () => {
                             )}
                         />
                     </div>
-                    <div className="flex mt-10 flex-col align-center"><div><Button variant='contained' type='submit'>Login</Button></div>
+                    <div className="flex mt-10 flex-col align-center">
+                        {errorMsg && <div className='error-msg' style={{ color: 'red' }}>{errorMsg}</div>}
+                        <div><Button variant='contained' type='submit'>Login</Button></div>
                         <div>Don't have an account ? <Link href="/register" underline="always">{'Sign up'}</Link>.</div>
                     </div>
                 </form>

@@ -1,6 +1,7 @@
 package com.ecommerce.userservice.service;
 
 import com.ecommerce.userservice.entity.User;
+import com.ecommerce.userservice.exceptions.PhoneAlreadyExists;
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,16 +32,21 @@ public class UserService {
 
     public ResponseEntity<String> registerUser(RegistrationForm form){
         User user = userRepo.findByEmail(form.getEmail());
-        if (user == null) {
+        User user2 = userRepo.findByPhoneNumber(form.getPhoneNumber());
+
+        if (user == null && user2 == null) {
 //            String firstName, String lastName, String email, int phoneNumber, String address, int pincode, String password
               userRepo.save(new User(form.getFirstName(),form.getLastName(),form.getEmail(),form.getPhoneNumber(),form.getAddress(), form.getPincode(), new BCryptPasswordEncoder(12).encode(form.getPassword())));
 //            userRepo.save(new User(form.getFirstName(),form.getLastName(),form.getEmail(),new BCryptPasswordEncoder(12).encode(form.getPassword())));
             return new ResponseEntity<String>("Account Created !!", HttpStatus.OK);
-        }else{
+        }else if(user != null){
             throw new EmailAlreadyExists("Email Already Exists !!");
+        }else{
+            throw new PhoneAlreadyExists("Phone Number Already Exists !!");
         }
     }
 
+    //This method is not getting used, need to use this method rather than direct executing logic in controller class.
     public ResponseEntity<String> loginUser(LoginForm form){
         Authentication authentication = manager.authenticate(new UsernamePasswordAuthenticationToken(form.getEmail(),form.getPassword()));
         if(authentication.isAuthenticated()){
@@ -64,5 +70,9 @@ public class UserService {
         }else{
             throw new UserNotFound("User Does not exists !!");
         }
+    }
+
+    public String getUsername(String email){
+        return userRepo.findByEmail(email).getFirstName();
     }
 }

@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: userservice-route
+          uri: lb://USERSERVICE  # The lb:// is for load-balanced routing to a service registered in Eureka
+          predicates:
+            - Path=/user/**  # The path matching predicate for incoming requests
+          filters:
+            - AuthenticationFilter
+
+        - id: cartservice-route
+          uri: lb://CARTSERVICE  # The lb:// is for load-balanced routing to a service registered in Eureka
+          predicates:
+            - Path=/cart/**  # The path matching predicate for incoming requests
+          filters:
+            - AuthenticationFilter
+
+        - id: orderservice-route
+          uri: lb://ORDERSERVICE  # The lb:// is for load-balanced routing to a service registered in Eureka
+          predicates:
+            - Path=/product/**  # The path matching predicate for incoming requests
+          filters:
+            - AuthenticationFilter
+
+        - id: productservice-route
+          uri: lb://PRODUCTSERVICE  # The lb:// is for load-balanced routing to a service registered in Eureka
+          predicates:
+            - Path=/product/**  # The path matching predicate for incoming requests
+          filters:
+            - AuthenticationFilter
+
+  security:
+    csrf:
+      enabled: false
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+server:
+  port: 8010
+
+eureka:
+  client:
+    service-url:
+      defaultZone : http://localhost:8761/eureka/
+      fetch-registry: true
+      register-with-eureka: true
+#eureka:
+#  client:
+#    fetch-registry: true
+#    register-with-eureka: true
