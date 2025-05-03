@@ -1,5 +1,6 @@
 package com.ecommerce.userservice.service;
 
+import com.ecommerce.userservice.dto.ResponseItem;
 import com.ecommerce.userservice.entity.User;
 import com.ecommerce.userservice.exceptions.PhoneAlreadyExists;
 import org.apache.catalina.connector.Response;
@@ -17,6 +18,9 @@ import com.ecommerce.userservice.dto.RegistrationForm;
 import com.ecommerce.userservice.exceptions.EmailAlreadyExists;
 import com.ecommerce.userservice.exceptions.UserNotFound;
 import com.ecommerce.userservice.repo.UserRepo;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -72,7 +76,14 @@ public class UserService {
         }
     }
 
-    public String getUsername(String email){
-        return userRepo.findByEmail(email).getFirstName();
+    public ResponseEntity<Object> getLoginResponse(String email){
+        User user = userRepo.findByEmail(email);
+        return ResponseEntity.ok(new ResponseItem(user.getFirstName(),user.getId()));
+    }
+
+    public ResponseEntity<User> getAccountInfo(int userId){
+        Optional<User> user = userRepo.findById(userId);
+        User foundUser = user.orElseThrow(() -> new UserNotFound("User with id "+userId+" not found !!"));
+        return ResponseEntity.ok(foundUser);
     }
 }

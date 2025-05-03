@@ -50,4 +50,13 @@ public class Cart {
     public boolean checkItemAvailabilityInCart(int pId){
         return cartItemsList.stream().anyMatch(item -> item.getPId() == pId);
     }
+
+    @Override
+    public String toString() {
+        return "Cart{" +
+                "cartId=" + cartId +
+                ", userId=" + userId +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

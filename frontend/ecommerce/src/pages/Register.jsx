@@ -50,7 +50,7 @@ const Register = () => {
                                 <TextField
                                     {...field}
                                     required
-                                    className="w-50"
+                                            className="w-50"
                                     id="outlined-required"
                                     label="First Name"
                                     placeholder='John'

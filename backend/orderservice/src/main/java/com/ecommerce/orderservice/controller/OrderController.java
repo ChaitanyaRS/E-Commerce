@@ -1,8 +1,9 @@
 package com.ecommerce.orderservice.controller;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import jakarta.ws.rs.Path;
+import com.ecommerce.orderservice.utility.OrderInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.orderservice.entity.Order;
 import com.ecommerce.orderservice.service.OrderService;
 import com.ecommerce.orderservice.utility.OrderDto;
 
@@ -25,12 +25,12 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/place-order")
-    public ResponseEntity<String> placeOrder(@RequestHeader("Idempotency-key") String key, @RequestBody OrderDto dto) {
+    public CompletableFuture<ResponseEntity<List<OrderInfo>>> placeOrder(@RequestHeader("Idempotency-key") String key, @RequestBody OrderDto dto) {
         return orderService.placeOrder(key, dto);
     }
 
     @GetMapping("/get-orders/{userId}")
-    public ResponseEntity<List<Order>> getAllOrderForUser(@PathVariable int userId){
+    public CompletableFuture<ResponseEntity<List<OrderInfo>>> getAllOrderForUser(@PathVariable int userId){
         return orderService.getOrdersByUserId(userId);
     }
 }

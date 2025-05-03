@@ -27,6 +27,7 @@ public class JwtValidator {
 
     public void validateToken(String token) throws SignatureException, ExpiredJwtException, Exception {
         try {
+            System.out.println("validating token");
             // Parse the JWT token and validate the signature
             Claims claims = Jwts.parser()
                     .setSigningKey(getKey())  // Set the secret key used for signing the JWT

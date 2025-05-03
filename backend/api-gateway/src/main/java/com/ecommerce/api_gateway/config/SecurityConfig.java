@@ -17,15 +17,18 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+
+        System.out.println("Reached Security Filter");
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(basic ->basic.disable())  // Disable HTTP Basic Authentication
                 .formLogin(login ->login.disable())  // Disable the default login form
-                .logout(logoutSpec -> logoutSpec.disable())// Disable CSRF
+//                .logout(logoutSpec -> logoutSpec.disable())// Disable CSRF
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/user/login", "/user/register").permitAll() // Allow only these endpoints
+                        .pathMatchers("/**").permitAll() // Allow only these endpoints
                         .anyExchange().authenticated()
+
                         // Restrict all other routes
                 );
 
@@ -45,7 +48,8 @@ public class SecurityConfig {
         return new CorsWebFilter(corsConfigurationSource());
     }
 
-    private UrlBasedCorsConfigurationSource corsConfigurationSource() {
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);

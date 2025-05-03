@@ -3,11 +3,16 @@ package com.ecommerce.cartservice.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import com.ecommerce.cartservice.feign.CartFeignClient;
+import com.ecommerce.cartservice.utility.CartDto;
+import com.ecommerce.cartservice.utility.CartItemDto;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.cartservice.entity.Cart;
@@ -71,7 +76,7 @@ public class CartService {
 
         //Quantity of product in the cart.
         int cartProdQuantity = item.get().getQuantity();
-        if(cartProdQuantity <= 0) {
+        if(cartProdQuantity <= 1) {
         	//If quantity is less than or equal to product 
         	log.info("Item "+item.get() + "removed from cart ");
         	cart.getCartItemsList().remove(item.get());
@@ -90,26 +95,47 @@ public class CartService {
         return ResponseEntity.ok().body("Removed !!");
     }
 
-    public ResponseEntity<String> updateCarts(ProductDto dto){
-    	
-    	
-    	
-    	return ResponseEntity.ok("Done !!");
-    }
-    
-    public ResponseEntity<List<CartItem>> getCartItemsforUser(int userId) {
+//    public ResponseEntity<String> updateCarts(ProductDto dto){
+//
+//
+//
+//    	return ResponseEntity.ok("Done !!");
+//    }
+//
+////    public ResponseEntity<List<CartItem>> getCartItemsforUser(int userId) {
+////        Cart cart = cartRepo.findByUserId(userId).orElseThrow(() -> new CartNotFound("Cart Not found for this user"));
+////        if(cart.getCartItemsList().isEmpty())
+////            throw new NoItemFound("Cart is Empty !!");
+////        else{
+////            List<CartItem> cartItems = cart.getCartItemsList();
+////            int totalPrice =
+////            return ResponseEntity.ok().body(cartItems);
+////        }
+////    }
+
+    @Async("customExecutor")
+    public CompletableFuture<ResponseEntity<CartDto>> getCartItemsforUser(int userId) {
+
         Cart cart = cartRepo.findByUserId(userId).orElseThrow(() -> new CartNotFound("Cart Not found for this user"));
         if(cart.getCartItemsList().isEmpty())
-            throw new NoItemFound("Cart is Empty !!"); 
+            throw new NoItemFound("Cart is Empty !!");
         else{
-            List<CartItem> cartItems = cart.getCartItemsList(); 
-            return ResponseEntity.ok().body(cartItems);
+            List<CartItem> cartItems = cart.getCartItemsList();
+            List<CartItemDto> cartItemsDto = cartItems.stream().map(item -> client.getProductById(item.getPId()).getBody()).toList();
+            for(int i = 0; i < cartItemsDto.size(); i++){
+                cartItemsDto.get(i).setQuantity(cartItems.get(i).getQuantity());
+            }
+            double totalPrice = cartItemsDto.stream().mapToDouble(item -> item.getPrice()*item.getQuantity()).sum();
+            return CompletableFuture.completedFuture(ResponseEntity.ok().body(new CartDto(cartItemsDto,totalPrice)));
         }
     }
 
     //This method updates the carts as per the product inventory.
-    //// Implementation not yet completed.
-    public ResponseEntity<List<Cart>> updateCartAccToInventory(int prodId){
+    //// Implementation not yet completed. - Not sure need to check.
+    /// Commenting @Async as I think multiple thread updating the same value will create issue or race condition.
+//    @Async("customExecutor")
+    @Transactional
+    public synchronized ResponseEntity<List<Cart>> updateCartAccToInventory(int prodId){
         List<Cart> cartsList = cartRepo.findAll();
 //        List<Cart> affectedCarts = cartsList.stream().filter(cart -> cart.getCartItemsList().stream().anyMatch(item -> item.getPId() == prodId)).toList();
 
@@ -157,5 +183,39 @@ public class CartService {
 
         log.info("Cart removed for user "+userId+" after placing order.");
         return ResponseEntity.ok("Cart Removed !!");
+    }
+
+
+    /// It checks the quantity of product in inventory then updates the cart accordingly.
+    public CompletableFuture<ResponseEntity<CartDto>> increaseQty(ProductDto dto) {
+        Optional<Integer> qtyOfProdInInventory = Optional.ofNullable(client.getQuantityOfSpecProd(dto.getProdId()).getBody());
+        if(qtyOfProdInInventory.isEmpty()){
+            throw new NoItemFound("Qty not received from product service !!");
+        }
+        Cart cart = cartRepo.findByUserId(dto.getUserId()).get();
+        List<CartItem> cartItems = cart.getCartItemsList();
+        CartItem itemInCart = cartItems.stream().filter(item -> item.getPId() == dto.getProdId()).findFirst().get();
+        int qtyOfProdInCart = itemInCart.getQuantity();
+        if(qtyOfProdInCart < qtyOfProdInInventory.get()){
+           itemInCart.setQuantity(itemInCart.getQuantity()+1);
+           cartRepo.save(cart);
+           return getCartItemsforUser(dto.getUserId());
+        }
+        return getCartItemsforUser(dto.getUserId());
+    }
+
+    /// It checks the quantity of product in inventory then updates the cart accordingly.
+    public CompletableFuture<ResponseEntity<CartDto>> decreaseQty(ProductDto dto) {
+        Cart cart = cartRepo.findByUserId(dto.getUserId()).orElseThrow(() -> new NoItemFound("User not found !!"));
+        List<CartItem> cartItems = cart.getCartItemsList();
+        CartItem itemInCart = cartItems.stream().filter(item -> item.getPId() == dto.getProdId()).findFirst().get();
+        int qtyOfProdInCart = itemInCart.getQuantity();
+        if(qtyOfProdInCart <= 1){
+            removeFromCart(dto);
+        }else{
+            itemInCart.setQuantity(itemInCart.getQuantity()-1);
+            cartRepo.save(cart);
+        }
+        return getCartItemsforUser(dto.getUserId());
     }
 }

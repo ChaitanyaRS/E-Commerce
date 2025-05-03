@@ -1,7 +1,9 @@
 package com.ecommerce.productservice.controller;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
+import com.ecommerce.productservice.utility.ProductToDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,7 +28,7 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/all-products")
-    public ResponseEntity<List<Product>> getAllProduct() {
+    public CompletableFuture<ResponseEntity<List<Product>>> getAllProduct() {
         return productService.getAllProducts();
     }
 
@@ -36,16 +38,14 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable int id) {
-        return productService.getProductById(id);
+    public ResponseEntity<ProductForm> getProductById(@PathVariable int id) {
+        Product prod = productService.getProductById(id);
+        ProductForm prodDto = ProductToDto.productFormDto(prod);
+        return ResponseEntity.ok(prodDto);
     }
 
-//    @DeleteMapping("/delete-product")
-//    public ResponseEntity<String> deleteProduct(@RequestParam int prodId, @RequestParam int userId) {
-//        return productService.removeProdFromInventory(prodId, userId);
-//    }
     @GetMapping("/qty-prod/{pId}")
-    public ResponseEntity<Integer> getQuantityOfSpecProd(@PathVariable int pId){
+    public CompletableFuture<ResponseEntity<Integer>> getQuantityOfSpecProd(@PathVariable int pId){
         return productService.getQtyOfSpecProd(pId);
     }
 
@@ -53,4 +53,15 @@ public class ProductController {
     public ResponseEntity<Integer> checkProdAvailability(@PathVariable("id") int id) {
         return productService.checkProdAvailability(id);
     }
+
+    @PostMapping("/populate")
+    public ResponseEntity<String> populateProducts(){
+        return productService.populateProducts();
+    }
+
+    @GetMapping("/get-price/{id}")
+    public CompletableFuture<ResponseEntity<Double>> getProdPrice(@PathVariable("id") int id){
+        return productService.getProdPrice(id);
+    }
+
 }

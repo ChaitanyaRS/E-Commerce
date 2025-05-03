@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { useForm, Controller } from "react-hook-form"
-import { Box, Button, Link, TextField } from "@mui/material"
+import {Box, Button, CircularProgress, Link, TextField} from "@mui/material"
 import { loginApi } from '../api/userApi'
 import './Utility.css'
-import { useDispatch } from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
@@ -12,8 +12,11 @@ const Login = () => {
     const [errorMsg, setErrorMsg] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const loginStatus = useSelector(state => state.auth.status)
+    const [btnEnabled, setBtnEnabled] = useState(true);
 
     const loginUser = async (data) => {
+        setBtnEnabled(false);
         console.log(data);
 
         const { email, password } = data;
@@ -21,24 +24,34 @@ const Login = () => {
         const formData = { email, password };
         // const { status, message } = await dispatch(loginApi(formData));
         const responseData = await dispatch(loginApi(formData));
-        const{status, username} = responseData.payload;
+        console.log(responseData.payload)
+        const{status, loginObj} = responseData.payload;
         console.log("status: ",status);
-        console.log("username: ",username);
+        console.log("username: ",loginObj.username);
 
         if (status == 200) {
             setErrorMsg("");
             navigate('/');
-            sessionStorage.setItem("username",username)
+            sessionStorage.setItem("username",loginObj.username)
+            setBtnEnabled(true)
         } else {
-            console.log(username);
-
-            setErrorMsg(username);
+            console.log(loginObj);
+            setBtnEnabled(true)
+            setErrorMsg(loginObj);
         }
 
     }
-
+    if (loginStatus === "loading" || loginStatus === "pending") {
+            return (
+            <div className="loader-container">
+                <center><CircularProgress /></center>
+            </div>
+        )
+    }
     return (
         // <>
+
+
         <div>
             <center className='mt-10'><h2>Login</h2></center>
             <Box className="form-control">
@@ -82,7 +95,7 @@ const Login = () => {
                     </div>
                     <div className="flex mt-10 flex-col align-center">
                         {errorMsg && <div className='error-msg' style={{ color: 'red' }}>{errorMsg}</div>}
-                        <div><Button variant='contained' type='submit'>Login</Button></div>
+                        <div><Button disabled={!btnEnabled} variant='contained' type='submit'>Login</Button></div>
                         <div>Don't have an account ? <Link href="/register" underline="always">{'Sign up'}</Link>.</div>
                     </div>
                 </form>

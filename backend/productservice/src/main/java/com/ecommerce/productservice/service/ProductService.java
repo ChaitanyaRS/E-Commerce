@@ -1,7 +1,9 @@
 package com.ecommerce.productservice.service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import feign.Response;
 import jakarta.transaction.Transactional;
@@ -9,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.productservice.entity.Category;
@@ -36,12 +39,13 @@ public class ProductService {
     @Autowired
     private KafkaPublisherService publisher;
 
-    public ResponseEntity<List<Product>> getAllProducts() {
+    @Async("customExecutor")
+    public CompletableFuture<ResponseEntity<List<Product>>> getAllProducts() {
         List<Product> productsList = productRepo.findAll();
         if (productsList.isEmpty())
             throw new ProductNotFound("No products present in inventory !!");
         else
-            return ResponseEntity.ok().body(productsList);
+            return CompletableFuture.completedFuture(ResponseEntity.ok().body(productsList));
     }
 
     public ResponseEntity<String> addProduct(ProductForm productDto) {
@@ -56,12 +60,12 @@ public class ProductService {
         return ResponseEntity.ok().body("Added");
     }
 
-    public ResponseEntity<Product> getProductById(int id) {
+    public Product getProductById(int id) {
         Optional<Product> product = productRepo.findById(id);
         if (product.isEmpty())
             throw new ProductNotFound("No product with mentioned id is present !!");
         else
-            return ResponseEntity.ok().body(product.get());
+            return product.get();
     }
 
     
@@ -118,8 +122,57 @@ public class ProductService {
 //        return ResponseEntity.ok(product.getPid());
     }
 
+    @Transactional
+    public CompletableFuture<ResponseEntity<Integer>> getQtyOfSpecProd(int pId) {
+        return CompletableFuture.completedFuture(ResponseEntity.ok(productRepo.findByPId(pId).get().getQuantity()));
+    }
 
-    public ResponseEntity<Integer> getQtyOfSpecProd(int pId) {
-        return ResponseEntity.ok(productRepo.findByPId(pId).get().getQuantity());
+    public ResponseEntity<String> populateProducts(){
+        List<ProductForm> productsList = Arrays.asList(
+                new ProductForm(1,"Laptop", "This is a Dell Laptop.", 50000, 5, "Electronics", "src\\assets\\dell.jpg", 5),
+                new ProductForm(2,"Car", "This is Santro Xing car.", 1000, 3, "Automobiles", "src\\assets\\santro.jpg", 4),
+                new ProductForm(3,"TV", "This is My TV.", 2000, 13, "Electronics", "src\\assets\\lgtv.jpg", 4),
+                new ProductForm(4,"Mobile", "This is iPhone 15.", 120000, 8, "Electronics", "src\\assets\\iphone.jpg", 5),
+                new ProductForm(5,"Headphone", "This is a Sony Headphone.", 15000, 20, "Electronics", "src\\assets\\sony.jpg", 4),
+                new ProductForm(6,"Refrigerator", "This is a Whirlpool Refrigerator.", 30000, 4, "Electronics", "src\\assets\\fridge.jpg", 4),
+                new ProductForm(7,"Camera", "This is a Nikon DSLR Camera.", 45000, 7, "Electronics", "src\\assets\\nikon.jpg", 5),
+                new ProductForm(8,"Smartwatch", "This is a Samsung Smartwatch.", 18000, 15, "Electronics", "src\\assets\\watch.jpg", 4)
+        );
+        for (ProductForm productDto : productsList) {
+            // Fetch category and rating as before
+            Category category = categoryRepo.findByCategoryName(productDto.getCategory());
+            Rating rating = ratingRepo.findById(productDto.getRatings()).get();
+
+            // Create the Product entity
+            Product product = new Product(
+                    productDto.getProductName(),
+                    productDto.getDescription(),
+                    productDto.getPrice(),
+                    productDto.getQuantity(),
+                    productDto.getImageLink(),
+                    category,
+                    rating
+            );
+
+            // Add the product to the category and rating's list of products
+            product.getCategory().addProdToList(product);
+            product.getRating().addProdToList(product);
+
+            // Save the product
+            productRepo.save(product);
+        }
+
+        // Return a response after all products have been added
+        return ResponseEntity.ok().body("All products added successfully");
+
+    }
+
+    public CompletableFuture<ResponseEntity<Double>> getProdPrice(int id) {
+        Optional<Product> prod = productRepo.findById(id);
+        if(prod.isPresent()){
+            return CompletableFuture.completedFuture(ResponseEntity.ok(prod.get().getPrice()));
+        }else{
+            throw new ProductNotFound("No Product with Product id "+id+" found");
+        }
     }
 }

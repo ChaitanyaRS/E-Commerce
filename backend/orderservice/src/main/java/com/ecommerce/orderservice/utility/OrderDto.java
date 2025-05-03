@@ -16,6 +16,8 @@ import lombok.ToString;
 public class OrderDto {
     private int userId;
     private String address;
+    private long contactNo;
+    private int pincode;
     private List<OrderItem> items;
     private double totalPrice;
 

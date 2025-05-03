@@ -1,5 +1,7 @@
 package com.ecommerce.userservice.controller;
 
+import com.ecommerce.userservice.dto.ResponseItem;
+import com.ecommerce.userservice.entity.User;
 import com.ecommerce.userservice.service.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,14 +44,14 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginForm user , HttpServletResponse response){
+    public ResponseEntity<Object> loginUser(@RequestBody LoginForm user , HttpServletResponse response){
         System.out.println("Reached login form.");
-        Authentication authentication = manager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+        Authentication    authentication = manager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
         if (authentication.isAuthenticated()) {
             System.out.println("Token : "+jwtService.generateToken(user.getEmail()));
             String token = jwtService.generateToken(user.getEmail());
             Cookie cookie = new Cookie("token", token);
-            cookie.setHttpOnly(true);
+            cookie.setHttpOnly(false);
             cookie.setPath("/");
             // cookie.setMaxAge(30000);
             cookie.setMaxAge(3600);
@@ -58,7 +60,7 @@ public class UserController {
             // cookie.setAttribute("SameSite", "Lax");
             // cookie.setSecure(false);
             response.addCookie(cookie);
-            return ResponseEntity.ok(userService.getUsername(user.getEmail()));
+            return userService.getLoginResponse(user.getEmail());
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
 
@@ -68,5 +70,10 @@ public class UserController {
     @DeleteMapping("/delete-user")
     public ResponseEntity<String> deleteUser(@RequestBody String email) {
         return userService.deleteUser(email);
+    }
+
+    @GetMapping("/account-info/{userid}")
+    public ResponseEntity<User> accountInfo(@PathVariable("userid") int userid){
+        return userService.getAccountInfo(userid);
     }
 }

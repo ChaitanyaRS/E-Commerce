@@ -31,4 +31,12 @@ public class CartItem {
         this.cart = cart;
     }
 
+    @Override
+    public String toString() {
+        return "CartItem{" +
+                "itemId=" + itemId +
+                ", pId=" + pId +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

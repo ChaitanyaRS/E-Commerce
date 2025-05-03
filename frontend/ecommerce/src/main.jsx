@@ -12,6 +12,7 @@ import Account from './pages/Account.jsx'
 import OrdersPlaced from './pages/OrdersPlaced.jsx'
 import { Provider } from 'react-redux'
 import { store } from './store/store.jsx'
+import PlaceOrder from "./pages/PlaceOrder.jsx";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,9 @@ const router = createBrowserRouter([
     },{
       path:"/order-placed",
       element:<OrdersPlaced/>
+    },{
+      path:"/place-order",
+      element:<PlaceOrder/>
     }]
   }
 ])

@@ -1,4 +1,4 @@
-package com.ecommerce.productservice.utility;
+package com.ecommerce.orderservice.utility;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductForm {
+public class ProductInfo {
     private int pId;
     private String productName;
     private String description;

@@ -66,3 +66,22 @@
 .x-large{
     font-size: x-large;
 }
+.justify-center{
+    justify-content: center;
+}
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    width: 100vw;
+}
+
+.row-gap{
+    gap: 20px;
+}
+

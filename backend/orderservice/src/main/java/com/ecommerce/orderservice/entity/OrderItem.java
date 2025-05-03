@@ -8,6 +8,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class OrderItem {
+//    private int oId;
     private int prodId;
     private int quantity;
     private double totalPrice;

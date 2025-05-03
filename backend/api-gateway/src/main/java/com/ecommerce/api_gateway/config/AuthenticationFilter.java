@@ -22,7 +22,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     @Override
     public GatewayFilter apply(Config config) {
         return ((exchange,chain)->{
-            System.out.println(exchange.getRequest().getCookies());
+            System.out.println("In Authentication Filter :"+exchange.getRequest().getCookies());
             System.out.println(exchange.getRequest());
             if(validator.isSecured.test(exchange.getRequest())){
                 if(!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)){
@@ -33,6 +33,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
                 if(authHeader != null && authHeader.startsWith("Bearer ")){
                     token = authHeader.substring(7);
+                    System.out.println("Token in api gateway:" + token);
                 }else{
                     throw new RuntimeException("Something went wrong.");
                 }

@@ -17,8 +17,6 @@ import { deepOrange } from '@mui/material/colors';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
-// const pages = [{name:'Home',link:'/home'}, {name:'Category',link:}, 'Cart'];
-// const settings = ['Account', 'Orders', 'Logout'];
 const firstLetter = "C"
 
 const Navbar = () => {
@@ -41,7 +39,7 @@ const Navbar = () => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
-    handleLogout();
+    // handleLogout();
   };
 
   const handleLogout = () => {
@@ -179,10 +177,10 @@ const Navbar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-                <MenuItem key='account' component='a' href='/account' onClick={handleCloseUserMenu}>
+                <MenuItem key='account' component='a' href='/account'>
                   <Typography sx={{ textAlign: 'center' }}>Account</Typography>
                 </MenuItem>
-                <MenuItem key='orders' component='a' href='/orders' onClick={handleCloseUserMenu}>
+                <MenuItem key='orders' component='a' href='/orders'>
                   <Typography sx={{ textAlign: 'center' }}>Orders</Typography>
                 </MenuItem>
                 {username &&

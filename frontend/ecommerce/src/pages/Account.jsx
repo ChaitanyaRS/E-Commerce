@@ -1,39 +1,65 @@
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField, Box, Link } from '@mui/material';
-import React, { useState } from 'react'
+import {Button, FormControl, InputLabel, MenuItem, Select, TextField, Box, Link, CircularProgress} from '@mui/material';
+import React, {useEffect, useState} from 'react'
 import { Controller, useForm } from 'react-hook-form';
 import './Utility.css';
 // import { registersUser } from '../api/userApi';
 import { useNavigate } from 'react-router-dom';
+import {useDispatch, useSelector} from "react-redux";
+import {userInfoApi} from '../api/userApi.jsx'
 
 const Account = () => {
     const { handleSubmit, control, formState: { errors } } = useForm();
     const navigate = useNavigate();
-    // const [registrationForm, setRegistrationForm] = useState({ username: '', password: '', email: '', phone_number: '', type: '' })
+    const userId = useSelector(state => state.auth.userId);
+    const dispatch = useDispatch();
+    const userInfo = useSelector(state => state.auth.user)
+    const accountStatus = useSelector(state => state.auth.accountStatus)
+    const isAuthenticated = useSelector(state => state.auth.isAuthenticated)
+    const userData = { firstName : userInfo.firstName, lastName : userInfo.lastName ,email: userInfo.email ,password:userInfo.password, phone_number:userInfo.phoneNumber,address:userInfo.address,pincode:userInfo.pincode}
+
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate("/login");
+        }else{
+            fetchUserData();
+        }
+
+    },[userId])
+
+    const fetchUserData = async () => {
+        if(userId !== undefined){
+            const data = await dispatch(userInfoApi(userId));
+            console.log("User data in account page ",userInfo);
+        }
+        else{
+            console.error("User is not logged in !!");
+            navigate("/login");
+        }
+    }
 
     const updateProfile = (data) => {
-        console.log(data);
-
         const { firstname, lastname,email,password, phone_number,address,pincode} = data;
         const formData = { firstname, lastname,email,password, phone_number,address,pincode};
-        console.log(formData);
-        console.log(response);
-        navigate('/');
+        console.log("Profile Info: ",formData);
     }
 
-    const handleChange = (e) => {
-        setSelectedValue(e.target.value);
+    if(accountStatus === 'loading'){
+        return (
+            <div className="loader-container">
+                <center><CircularProgress /></center>
+            </div>
+        )
     }
-
     return (
         <div>
-             <center className='mt-10'><h2>Create Account</h2></center>
+             <center className='mt-10'><h2>Account Information</h2></center>
             <Box className="form-control row-flex">
                 <form onSubmit={handleSubmit(updateProfile)}>
-                    <div className="flex row">
+                    <div className="flex row row-gap">
                         <Controller
                             name='firstname'
                             control={control}
-                            defaultValue=""
 
                             render={({ field }) => (
                                 <TextField
@@ -42,8 +68,7 @@ const Account = () => {
                                     className="w-50"
                                     id="outlined-required"
                                     label="First Name"
-                                    placeholder='John'
-                                    // className='w-100'
+                                    defaultValue={userInfo.firstName}
                                     error={!!errors.firstname}
                                     helperText={errors.firstname ? errors.firstname.message : ''}
                                 />
@@ -52,7 +77,7 @@ const Account = () => {
                         <Controller
                             name='lastname'
                             control={control}
-                            defaultValue=""
+                            // defaultValue={userInfo.lastName}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
@@ -60,19 +85,18 @@ const Account = () => {
                                     className="w-50"
                                     id="outlined-required"
                                     label="Last Name"
-                                    placeholder='Wick'
-                                    // className='w-100'
+                                    defaultValue={userInfo.lastName}
                                     error={!!errors.lastname}
                                     helperText={errors.lastname ? errors.lastname.message : ''}
                                 />
                             )}
                         />
                     </div>
-                    <div className="flex row">
+                    <div className="flex row row-gap">
                         <Controller
                             name='email'
                             control={control}
-                            defaultValue=""
+                            // defaultValue=""
 
                             render={({ field }) => (
                                 <TextField
@@ -81,8 +105,7 @@ const Account = () => {
                                     className="w-50"
                                     id="outlined-required"
                                     label="Email"
-                                    placeholder='johnwick@gmail.com'
-                                    // className='w-100'
+                                    defaultValue={userInfo.email}
                                     error={!!errors.email}
                                     helperText={errors.email ? errors.email.message : ''}
                                 />
@@ -91,7 +114,7 @@ const Account = () => {
                         <Controller
                             name='phone_number'
                             control={control}
-                            defaultValue=""
+                            // defaultValue=""
                             render={({ field }) => (
                                 <TextField
                                     {...field}
@@ -99,20 +122,18 @@ const Account = () => {
                                     className="w-50"
                                     id="outlined-required"
                                     label="Phone Number"
-                                    placeholder='John'
-                                    // className='w-100'
                                     type='number'
+                                    defaultValue = {userInfo.phoneNumber}
                                     error={!!errors.phone_number}
                                     helperText={errors.phone_number ? errors.phone_number.message : ''}
                                 />
                             )}
                         />
                     </div>
-                    <div className="flex row">
+                    <div className="flex row row-gap">
                         <Controller
                             name='address'
                             control={control}
-                            defaultValue=""
 
                             render={({ field }) => (
                                 <TextField
@@ -121,8 +142,7 @@ const Account = () => {
                                     className="w-50"
                                     id="outlined-required"
                                     label="Address"
-                                    placeholder='Hadapsar, Pune'
-                                    // className='w-100'
+                                    defaultValue={userInfo.address}
                                     error={!!errors.address}
                                     helperText={errors.address ? errors.address.message : ''}
                                 />
@@ -131,14 +151,13 @@ const Account = () => {
                         <Controller
                             name='pincode'
                             control={control}
-                            defaultValue=""
+                            defaultValue={userInfo.pincode}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
                                     required
                                     id="outlined-required"
                                     label="Pincode"
-                                    placeholder='411028'
                                     className='w-50'
                                     type='number'
                                     error={!!errors.pincode}
@@ -147,7 +166,7 @@ const Account = () => {
                             )}
                         />
                     </div>
-                    <div className="row flex">
+                    <div className="row flex row-gap">
                         <Controller
                             name='password'
                             control={control}
@@ -187,7 +206,6 @@ const Account = () => {
                     </div>
                     <div className="flex mt-10 flex-col align-center"><div><Button variant='contained' type='submit'>Save</Button></div>
                     </div>
-                    {/* <div className="flex mt-10"><Button variant='contained' sx={{ margin: "auto" }} type='submit'>Submit</Button></div> */}
                 </form>
             </Box>
         </div>

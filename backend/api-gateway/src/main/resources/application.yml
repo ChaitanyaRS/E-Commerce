@@ -9,34 +9,36 @@ spring:
           predicates:
             - Path=/user/**  # The path matching predicate for incoming requests
           filters:
-            - AuthenticationFilter
+            - name: AuthenticationFilter
 
         - id: cartservice-route
           uri: lb://CARTSERVICE  # The lb:// is for load-balanced routing to a service registered in Eureka
           predicates:
             - Path=/cart/**  # The path matching predicate for incoming requests
           filters:
-            - AuthenticationFilter
+            - name: AuthenticationFilter
 
         - id: orderservice-route
           uri: lb://ORDERSERVICE  # The lb:// is for load-balanced routing to a service registered in Eureka
           predicates:
-            - Path=/product/**  # The path matching predicate for incoming requests
+            - Path=/orders/**  # The path matching predicate for incoming requests
           filters:
-            - AuthenticationFilter
+            - name: AuthenticationFilter
 
         - id: productservice-route
           uri: lb://PRODUCTSERVICE  # The lb:// is for load-balanced routing to a service registered in Eureka
           predicates:
             - Path=/product/**  # The path matching predicate for incoming requests
           filters:
-            - AuthenticationFilter
+            - name: AuthenticationFilter
 
   security:
     csrf:
       enabled: false
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration
 server:
   port: 8010
 
