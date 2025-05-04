@@ -2,7 +2,7 @@ This is a Multithreaded Ecommerce application, designed with High JWT Security. 
 
 Tech Stack : 
 1. Backend  : Java
-2. Frontend : ReactJS
+2. Frontend : Vite@ReactJS
 3. Database : MongoDB, MySQL, PostgresSQL.
 
 Features:
@@ -10,3 +10,4 @@ Features:
 2. JWT Security.
 3. Microservice with Eureka Server and Api-Gateway, along with Feign Client for Api calls.
 4. Kafka Messaging Service.
+5. Redux-Toolkit.
